@@ -16,7 +16,7 @@ namespace GameGMD
     {
         #region player
         private Player player;
-        private int moveDistance;
+        private float moveDistance;
         #endregion
 
         #region main loop
@@ -118,13 +118,14 @@ namespace GameGMD
                     case Keys.A:
                         {
                             // buttonA.Execute();
-                            buttonA.Execute(player, moveDistance);
-                            //player.MoveLeft(moveDistance);
+                            //buttonA.Execute(player, moveDistance);
+                            player.MoveLeft(moveDistance);
                             break;
                         }
                     case Keys.D:
                         {
-                            buttonD.Execute(player, moveDistance);
+                            //buttonD.Execute(player, moveDistance);
+                            player.MoveRight(moveDistance);
                             break;
                         }
                     case Keys.Space:
@@ -142,8 +143,8 @@ namespace GameGMD
 
         private void Update(TimeSpan time)
         {
-            double timeElapsed = time.TotalMilliseconds / 1000;
-            moveDistance = (int)(player.Velocity * timeElapsed);
+            float timeElapsed = (float)time.TotalMilliseconds / 1000;
+            moveDistance = player.Velocity * timeElapsed;
             if (gameOn)
             {
                 CheckForCollision();

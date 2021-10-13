@@ -66,12 +66,12 @@ namespace GameGMD
             this.Height = Height;
         }
 
-        public void MoveLeftBy(int distance)
+        public void MoveLeftBy(float distance)
         {
             if (X >= 5)
                 X -= distance;
         }
-        public void MoveRightBy(int distance)
+        public void MoveRightBy(float distance)
         {
             if (X <= 655)
                 X += distance;

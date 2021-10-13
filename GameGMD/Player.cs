@@ -15,12 +15,12 @@ namespace GameGMD
             physics.SetSize(SpriteImg.Width, SpriteImg.Height);
         }
 
-        public void MoveRight(int distance)
+        public void MoveRight(float distance)
         {
             physics.MoveRightBy(distance);
         }
 
-        public void MoveLeft(int distance)
+        public void MoveLeft(float distance)
         {
             physics.MoveLeftBy(distance);
         }
