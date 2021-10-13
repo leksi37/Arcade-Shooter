@@ -12,7 +12,7 @@ namespace GameGMD.Flyweight
 
         void SetFallRate(float distance);
 
-        void UpdatePosition(double X, double Y);
+        void UpdatePosition(float X, float Y);
 
         bool ShouldDestroy();
 

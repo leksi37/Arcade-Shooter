@@ -26,7 +26,7 @@ namespace GameGMD.Flyweight
             this.distance = distance;
         }
 
-        public void UpdatePosition(double X, double Y)
+        public void UpdatePosition(float X, float Y)
         {
             Enemy.UpdatePosition(X, Y);
         }

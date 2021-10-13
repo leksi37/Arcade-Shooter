@@ -25,7 +25,7 @@ namespace GameGMD
             physics.MoveLeftBy(distance);
         }
 
-        public void UpdatePosition(double X, double Y)
+        public void UpdatePosition(float X, float Y)
         {
             physics.UpdatePosition(X, Y);
         }
