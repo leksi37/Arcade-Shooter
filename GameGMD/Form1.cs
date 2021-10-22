@@ -1,7 +1,6 @@
 ﻿using GameGMD.Enemies;
 using GameGMD.EnemyPool;
 using GameGMD.Flyweight;
-using GameGMD.Input_CommandPattern;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using GameGMD.CollisionsClasses;
 
 namespace GameGMD
 {
@@ -39,7 +39,7 @@ namespace GameGMD
         #endregion
 
         #region graphics list
-        private List<GraphicsObject> graphicsObjs = new List<GraphicsObject>();
+        private List<GameObject> graphicsObjs = new List<GameObject>();
         #endregion
 
         #region score display
@@ -48,19 +48,15 @@ namespace GameGMD
 
         #region input
         private readonly List<Keys> input = new List<Keys>();
-        #region Command pattern NOT FINISHED
-        Command buttonSpace;
-        Command buttonA;
-        Command buttonD;
         #endregion
+
+        #region physics
+        private CollisionsClasses.CollisionDetector collisionDetector;
         #endregion
 
         public Form1()
         {
             InitializeComponent();
-            buttonSpace = new Fire();
-            buttonA = new MoveLeft();
-            buttonD = new MoveRight();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -86,6 +82,7 @@ namespace GameGMD
                 prevTime = prevTime + GameTime;
                 if (gameOn)
                 {
+                    //GameLoop
                     HandleInput();
                     Update(GameTime);
                     Render();
@@ -104,6 +101,8 @@ namespace GameGMD
             fallRate = 0.1f;
 
             graphicsObjs.Add(player);
+
+            collisionDetector = new CollisionsClasses.CollisionDetector(980, 655);
         }
 
         private void HandleInput()
@@ -117,14 +116,11 @@ namespace GameGMD
                 {
                     case Keys.A:
                         {
-                            // buttonA.Execute();
-                            //buttonA.Execute(player, moveDistance);
                             player.MoveLeft(moveDistance);
                             break;
                         }
                     case Keys.D:
                         {
-                            //buttonD.Execute(player, moveDistance);
                             player.MoveRight(moveDistance);
                             break;
                         }
@@ -147,11 +143,15 @@ namespace GameGMD
             moveDistance = player.Velocity * timeElapsed;
             if (gameOn)
             {
-                CheckForCollision();
+                //Update physics
+                collisionDetector.Update();
+                collisionDetector.DetectCollisions();
+                //Handle game objects
+                RunGame();
+                //Clean
                 GC.Collect();
             } 
         }
-
         private void Render()
         {
             if (gameOn)
@@ -161,13 +161,14 @@ namespace GameGMD
                 graphics.FillRectangle(new SolidBrush(Color.LightPink), new Rectangle(0, 0, playerCanvas.Width, playerCanvas.Height));
 
                 //sparkle.Sparkle(graphics);
+                //TO DO
                 foreach (Bullet bullet in bullets)
                 { 
                     if (bullet.shouldDestroy())
-                        bullet.isDirty = true;
+                        bullet.toBeDestroyed = true;
                 }
 
-                foreach (GraphicsObject graphic in graphicsObjs)
+                foreach (GameObject graphic in graphicsObjs)
                 {
                     graphic.Render(graphics);
                 }
@@ -183,9 +184,11 @@ namespace GameGMD
             while (isRunning)
             {
                 var enemy = enemySpawner.Spawn();
+                Collider collider = new Collider((GameObject)enemy);
+                //collider.UpdateCollider();
                 enemy.SetFallRate(fallRate);
                 enemies.Add(enemy);
-                graphicsObjs.Add((GraphicsObject)enemy);
+                graphicsObjs.Add((GameObject)enemy);
 
                 await Task.Delay(spawnRate);
             }
@@ -207,35 +210,47 @@ namespace GameGMD
                 if(enemy.ShouldEndGame())
                 {
                     gameOn = false;
-                    ShowEndGamePanel();
+                    //ShowEndGamePanel();
                 }
             }
 
 
-            foreach(Bullet bullet in bullets.ToList())
-            {
+            //foreach(Bullet bullet in bullets.ToList())
+            //{
                 
-                foreach(IEnemy enemy in enemies.ToList())
-                {
-                    if (bullet.CollidesWith(enemy.GetObjectsPhysics()))
-                    {
+            //    foreach(IEnemy enemy in enemies.ToList())
+            //    {
+            //        if (bullet.CollidesWith(enemy.GetObjectsPhysics()))
+            //        {
 
-                        UpdateScore();
+            //            UpdateScore();
 
-                        int deadEnemy = enemies.IndexOf(enemy);
-                        int brokenBullet = bullets.IndexOf(bullet);
-                        enemy.DestroyEnemy();
-                        enemySpawner.Remove(enemy);
-                        bullet.isDirty = true;
-                        graphicsObjs.Remove(bullet);
-                    }
-                }
+            //            int deadEnemy = enemies.IndexOf(enemy);
+            //            int brokenBullet = bullets.IndexOf(bullet);
+            //            enemy.DestroyEnemy();
+            //            enemySpawner.Remove(enemy);
+            //            bullet.toBeDestroyed = true;
+            //            graphicsObjs.Remove(bullet);
+            //        }
+            //    }
+            //}
+
+            //if(enemies.FindAll((enemy) => enemy.ShouldDestroy()).Count > 0)
+            //    RemoveHitEnemies();
+            //DestroyBullets();
+        }
+
+        private void RunGame()
+        {
+            var running = enemies.Find((IEnemy enemy) => enemy.ShouldEndGame());
+            if(running != null)
+            {
+                ShowEndGamePanel();
             }
-
-            if(enemies.FindAll((enemy) => enemy.ShouldDestroy()).Count > 0)
-                RemoveHit();
+            RemoveHitEnemies();
             DestroyBullets();
         }
+
 
         private void UpdateScore()
         {
@@ -245,25 +260,34 @@ namespace GameGMD
             spawnRate -= 5;
         }
 
-        private void RemoveHit()
+        private void RemoveHitEnemies()
         {
             var tempArr = enemies.FindAll((IEnemy enemy) => enemy.ShouldDestroy());
-            graphicsObjs.RemoveAll((GraphicsObject enemy) => enemy is IEnemy && ((IEnemy)enemy).ShouldDestroy());
+            foreach(var deadMonster in tempArr)
+            {
+                UpdateScore();
+                if (deadMonster.ShouldEndGame())
+                {
+                    gameOn = false;
+                }
+            }
+            graphicsObjs.RemoveAll((GameObject enemy) => enemy is IEnemy && ((IEnemy)enemy).ShouldDestroy());
             enemies.RemoveAll((IEnemy enemy) => enemy.ShouldDestroy());
             tempArr.ForEach((enemy) => enemy.Reset());
         }
 
         private void DestroyBullets()
         {
-            graphicsObjs.RemoveAll((GraphicsObject graphics) => (graphics is Bullet) && ((Bullet)graphics).isDirty == true);
+            graphicsObjs.RemoveAll((GameObject graphics) => (graphics is Bullet) && ((Bullet)graphics).toBeDestroyed == true);
                 //((Bullet)bullet).isDirty == true));
 
-            bullets.RemoveAll((Bullet bullet) => bullet.isDirty == true);
+            bullets.RemoveAll((Bullet bullet) => bullet.toBeDestroyed == true);
         }
 
         private void Shoot()
         {
             Bullet bullet = new Bullet();
+            Collider collider = new Collider((GameObject)bullet);
             bullet.SpawnBullet(player.GetLocation());
             bullets.Add(bullet);
             graphicsObjs.Add(bullet);
@@ -289,19 +313,33 @@ namespace GameGMD
 
         private void ShowEndGamePanel()
         {
-           Button retry = new Button();
-           retry.Text = "Start";
-           DialogResult result = MessageBox.Show("Game Over! Your score is " + playerScore + " Try again?",
-           "Game Over",
-           MessageBoxButtons.YesNo);
-           if (result == DialogResult.No)
-           {
+            Button retry = new Button();
+            retry.Text = "Start";
+            DialogResult result =  MessageBox.Show("Game Over! Your score is " + playerScore + " Try again?", "Game Over", MessageBoxButtons.YesNo);
+            //result.
+            if (result == DialogResult.No)
+            {
                 isRunning = false;
-           }
-           if (result == DialogResult.Yes)
-           {
-               RestartGame();
-           }
+            }
+            if (result == DialogResult.Yes)
+            {
+                //RestartGame();
+
+                //e.Cancel;
+
+                Application.Restart();
+            }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (MessageBox.Show("Exit or no?",
+                               "My First Application",
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Information) == DialogResult.No)
+            {
+                e.Cancel = true;
+            }
         }
     }
 }

@@ -16,8 +16,6 @@ namespace GameGMD.Flyweight
 
         bool ShouldDestroy();
 
-        PhysicsObject GetObjectsPhysics();
-
         void DestroyEnemy();
 
         bool ShouldEndGame();

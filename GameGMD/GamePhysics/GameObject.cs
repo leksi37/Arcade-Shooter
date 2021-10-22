@@ -7,8 +7,15 @@ using System.Threading.Tasks;
 
 namespace GameGMD
 {
-    interface GraphicsObject
+    public interface GameObject
     {
         void Render(Graphics graphics);
+
+        float GetPositionX();
+        float GetPositionY();
+        float GetSizeX();
+        float GetSizeY();
+
+        void CollisionTriggered(GameObject other);
     }
 }

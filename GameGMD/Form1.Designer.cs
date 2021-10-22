@@ -57,7 +57,7 @@ namespace GameGMD
             // 
             this.playerCanvas.Location = new System.Drawing.Point(3, -2);
             this.playerCanvas.Name = "playerCanvas";
-            this.playerCanvas.Size = new System.Drawing.Size(983, 655);
+            this.playerCanvas.Size = new System.Drawing.Size(980, 655);
             this.playerCanvas.TabIndex = 0;
             this.playerCanvas.TabStop = false;
             // 

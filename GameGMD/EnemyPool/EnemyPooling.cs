@@ -10,12 +10,12 @@ namespace GameGMD.EnemyPool
 {
     // This clas is a Factory method pattern and it's used for enemy object pooling
     // Used by the EnemySpawner(Creator) clas, which is used in the gameLoop(Product)
-    class EnemyFactory
+    class EnemyPooling
     {
         // The Enemy Objects Pool
         private readonly List<IEnemy> enemyPool;
 
-        public EnemyFactory()
+        public EnemyPooling()
         {
             enemyPool = new List<IEnemy>();
         }

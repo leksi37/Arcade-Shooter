@@ -10,11 +10,11 @@ namespace GameGMD.Enemies
 {
     class EnemySpawner
     {
-        private EnemyFactory enemyFactory;
+        private EnemyPooling enemyFactory;
 
         public EnemySpawner()
         {
-            enemyFactory = new EnemyFactory();
+            enemyFactory = new EnemyPooling();
         }
 
         public void Remove(IEnemy enemy)

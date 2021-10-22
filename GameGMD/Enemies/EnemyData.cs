@@ -1,52 +1,63 @@
-﻿using System;
+﻿using GameGMD.CollisionsClasses;
+using System;
 using System.Drawing;
 
 namespace GameGMD
 {
-    class EnemyData : PhysicsObject
+    class EnemyData
     {
-        public bool isDirty;
+        public bool shouldDestroy;
+        private Position position;
 
         public EnemyData(Bitmap SpriteImg)
         {
-            physics = new Physics();
-            physics.SetSize(SpriteImg.Width, SpriteImg.Height);
+            position = new Position();
+            position.SetSize(SpriteImg.Width, SpriteImg.Height);
            
         }
 
         public void MoveDown(float distance)
         {
-            physics.MoveDownBy(distance);
+            position.MoveDownBy(distance);
         }
 
         public void UpdatePosition(float X, float Y)
         {
-            physics.UpdatePosition(X, Y);
+            position.UpdatePosition(X, Y);
         }
+
+        public float GetY()
+        {
+            return position.GetXY().Y;
+        }
+
+        public float GetX()
+        {
+            return position.GetXY().X;
+        }
+
 
         public bool ShouldEndGame()
         {
-            return physics.HitBottom();
+            return position.HitBottom();
         }
 
         public bool ShouldDestroy()
         {
-            return isDirty;
+            if (shouldDestroy)
+            {
+                  shouldDestroy = true;
+            }
+            return shouldDestroy;
         }
 
         public void Draw(Graphics graphics, Bitmap SpriteImg)
         {
-            graphics.DrawImage(SpriteImg, physics.GetLocationAndSize());
+            graphics.DrawImage(SpriteImg, position.GetLocationAndSize());
         }
-
-        public PhysicsObject GetObjectsPhysics()
-        {
-            return this;
-        }
-
         public void DestroyEnemy()
         {
-            isDirty = true;
+            shouldDestroy = true;
         }
     }
 }

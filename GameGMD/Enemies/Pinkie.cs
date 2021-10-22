@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 
 namespace GameGMD.Flyweight
 {
-    class Pinkie: IEnemy, GraphicsObject
+    class Pinkie: IEnemy, GameObject
     {
         private EnemyData Enemy;
         private Bitmap SpriteImage;
@@ -36,11 +31,6 @@ namespace GameGMD.Flyweight
             return Enemy.ShouldDestroy();
         }
 
-        public PhysicsObject GetObjectsPhysics()
-        {
-            return Enemy.GetObjectsPhysics();
-        }
-
         public void DestroyEnemy()
         {
             Enemy.DestroyEnemy();
@@ -52,13 +42,36 @@ namespace GameGMD.Flyweight
 
         public void Reset()
         {
-            Enemy.isDirty = false;
+            Enemy.shouldDestroy = false;
         }
 
         public void Render(Graphics graphics)
         {
             Enemy.MoveDown(distance);
             Enemy.Draw(graphics, SpriteImage);
+        }
+
+        public float GetPositionX()
+        {
+            return Enemy.GetX();
+        }
+
+        public float GetPositionY()
+        {
+            return Enemy.GetY();
+        }
+        public float GetSizeX()
+        {
+            return SpriteImage.Width;
+        }
+
+        public float GetSizeY()
+        {
+            return SpriteImage.Height;
+        }
+        public void CollisionTriggered(GameObject other)
+        {
+            Enemy.shouldDestroy = true;
         }
     }
 }

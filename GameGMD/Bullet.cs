@@ -1,45 +1,70 @@
-﻿using System;
+﻿using GameGMD.CollisionsClasses;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace GameGMD
 {
-    class Bullet: PhysicsObject, GraphicsObject
+    class Bullet: GameObject
     {
         private readonly Bitmap SpriteImg = Properties.Resources.Fire;
-        public bool isDirty;
+        public bool toBeDestroyed = false;
+        private Position position;
 
         public Bullet()
         {
-            physics = new Physics();
-            physics.SetSize(10, 10);
+            position = new Position();
+            position.SetSize(10, 10);
             
         }
 
         public void SpawnBullet(Point playerXY)
         {
-            physics.UpdatePosition(playerXY);
-        }
-
-        public bool CollidesWith(PhysicsObject physicsObj)
-        {
-            return this.physics.IsHitBy(physicsObj.GetBounds());
+            position.UpdatePosition(playerXY);
         }
 
         private void Move()
         {
-            physics.MoveUpBy(1);
+            position.MoveUpBy(1);
         }
 
         public bool shouldDestroy()
         {
-            return physics.HitTop();
+            if (toBeDestroyed || position.HitTop())
+                return true;
+            else
+                return false;
         }
 
         public void Render(Graphics graphics)
         {
             Move();
-            graphics.DrawImage(SpriteImg, physics.GetLocationAndSize());
+            graphics.DrawImage(SpriteImg, position.GetLocationAndSize());
+        }
+
+        public float GetPositionX()
+        {
+            return position.GetXY().X;
+        }
+
+        public float GetPositionY()
+        {
+            return position.GetXY().Y;
+        }
+
+        public float GetSizeX()
+        {
+            return 10;// SpriteImg.Width;
+        }
+
+        public float GetSizeY()
+        {
+            return 10;// SpriteImg.Height;
+        }
+
+        public void CollisionTriggered(GameObject other)
+        {
+            toBeDestroyed = true;
         }
     }
 }

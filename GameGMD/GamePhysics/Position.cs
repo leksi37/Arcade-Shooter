@@ -1,42 +1,14 @@
 ﻿using System.Drawing;
 
-namespace GameGMD
+namespace GameGMD.CollisionsClasses
 {
-    class Physics
+    public class Position
     {
-        private Rectangle Bounds;
         private float X { get; set; }
         private float Y { get; set; }
         private float Width { get; set; }
         private float Height { get; set; }
 
-        public Physics()
-        {
-            Bounds = new Rectangle();
-        }
-
-        private void UpdateBounds()
-        {
-            Bounds.X = (int)X;
-            Bounds.Y = (int)Y;
-            Bounds.Width = (int)Width;
-            Bounds.Height = (int)Height;
-        }
-
-        public bool IsHitBy(Rectangle otherObjBounds)
-        {
-            UpdateBounds();
-            if (Bounds.IntersectsWith(otherObjBounds))
-                return true;
-            else
-                return false;
-        }
-
-        public Rectangle GetBounds()
-        {
-            UpdateBounds();
-            return Bounds;
-        }
 
         public RectangleF GetLocationAndSize()
         {
